@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
+import validator from "validator";
 
 const Register = () => {
   const [firstName, setFirstName] = useState("");
@@ -19,6 +20,20 @@ const Register = () => {
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
+  const validate = (value) => {
+    if (value.length < 6) {
+      enqueueSnackbar(
+        {
+          message:
+            "Password not long enough! Password should be at least 6 characters long",
+        },
+        { variant: "error" }
+      );
+    } else {
+      handleRegister();
+    }
+  };
+
   const handleRegister = () => {
     const data = {
       firstName,
@@ -29,15 +44,22 @@ const Register = () => {
       country,
     };
     axios
-      .post(`http://localhost:4000/Register`, data)
+      .post(`http://localhost:4000/api/Register`, data)
       .then(() => {
         enqueueSnackbar("Registered successfully!", { variant: "success" });
         navigate("/Login");
-        console.log(response.data)
+        console.log("hello");
       })
       .catch((error) => {
         console.log(error.response.data);
-        enqueueSnackbar({ message: error.message }, { variant: "error" });
+        Object.keys(error.response.data.errors).forEach((key) => {
+          if (error.response.data.errors[key] != "") {
+            enqueueSnackbar(
+              { message: error.response.data.errors[key] },
+              { variant: error }
+            );
+          }
+        });
       });
   };
 
@@ -84,6 +106,7 @@ const Register = () => {
                 placeholder="First Name"
                 value={firstName}
                 onChange={(ev) => setFirstName(ev.target.value)}
+                required
               />
             </div>
             <div className="flex flex-col w-1/2">
@@ -92,7 +115,10 @@ const Register = () => {
                 type="text"
                 placeholder="Last Name"
                 value={lastName}
-                onChange={(ev) => setLastName(ev.target.value)}
+                onChange={(ev) => {
+                  setLastName(ev.target.value);
+                }}
+                required
               />
             </div>
           </div>
@@ -103,6 +129,7 @@ const Register = () => {
               placeholder="Email"
               value={email}
               onChange={(ev) => setEmail(ev.target.value)}
+              required
             />
           </div>
           <div className="flex flex-col w-full">
@@ -111,7 +138,10 @@ const Register = () => {
               type="password"
               placeholder="Password"
               value={password}
-              onChange={(ev) => setPassword(ev.target.value)}
+              onChange={(ev) => {
+                setPassword(ev.target.value);
+              }}
+              required
             />
           </div>
           <div className="flex flex-col w-full">
@@ -121,6 +151,7 @@ const Register = () => {
               placeholder="Confirm Password"
               value={confirmPassword}
               onChange={(ev) => setConfirmPassword(ev.target.value)}
+              required
             />
           </div>
           <div className="flex w-full justify-center items-center space-x-5">
@@ -131,6 +162,7 @@ const Register = () => {
                 id="sex"
                 value={sex}
                 onChange={(ev) => setSex(ev.target.value)}
+                required
               >
                 <option value="null">Select sex</option>
                 <option value="Male">Male</option>
@@ -144,6 +176,7 @@ const Register = () => {
                 id="country"
                 value={country}
                 onChange={(ev) => setCountry(ev.target.value)}
+                required
               >
                 <option value="null">Select country</option>
                 <option value="Egypt">Egypt</option>
@@ -183,7 +216,7 @@ const Register = () => {
           </div>
           <button
             className="bg-blue-500 rounded-sm text-white py-3 px-10 font-bold md:hover:bg-orange-200"
-            onClick={handleRegister}
+            onClick={validate}
           >
             Register
           </button>

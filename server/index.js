@@ -4,10 +4,14 @@ import cors from 'cors'
 import 'dotenv/config'
 import registerRoutes  from "./routes/registerRoutes.js";
 import loginRoutes from "./routes/loginRoutes.js";
+import cookieParser from "cookie-parser";
+import jwt from "jsonwebtoken";
 const app = express();
-app.use(express.json());
 
-app.use(cors());
+
+app.use(express.json());
+app.use(cors({credentials:true, origin: "http://localhost:5173"}));
+app.use(cookieParser());
 
 const connection = process.env.CONNECTION;
 
@@ -20,9 +24,22 @@ mongoose.connect(connection).then(()=>{
     console.log(error);
 })
 
+app.get('/profile', (req, res)=>{
+    const {token} = req.cookies.token;
 
-app.use("/Register", registerRoutes)
-app.use("/Login", loginRoutes)
+    jwt.verify(token, process.env.SECRET, (err, info)=>{
+        if(err) throw err;
+        console.log(err);
+        res.json(info);
+    })
+})
+
+app.post('/logout', (req, res)=>{
+    res.cookie('token', '')
+})
+
+app.use("/api/Register", registerRoutes)
+app.use("/api/Login", loginRoutes)
 
 
 

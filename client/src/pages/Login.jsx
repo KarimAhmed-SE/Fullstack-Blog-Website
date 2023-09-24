@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Logo from "./components/Logo.png";
 import google from "./Google Logo.png";
 import facebook from "./fb_icon_325x325.png";
@@ -7,10 +7,12 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useSnackbar } from "notistack";
+import { userContext } from "../userContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const {setUserInfo} = useContext(userContext)
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
@@ -21,12 +23,15 @@ const Login = () => {
     };
 
     axios
-      .post(`http://localhost:4000/Login`, data)
-      .then(() => {
+      .post(`http://localhost:4000/api/Login`, data, {withCredentials:true})
+      .then((response) => {
+        setUserInfo(response.data)
+        console.log(response.data)
         enqueueSnackbar("logged in successfully!", { variant: "success" });
         navigate("/");
-        console.log(data.email);
-        console.log(data.password);
+        // console.log(data.email);
+        // console.log(data.password);
+
       })
       .catch((error) => {
         if (error.response) {
