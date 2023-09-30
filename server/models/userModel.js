@@ -36,6 +36,9 @@ const userSchema = mongoose.Schema({
     country:{
         type:String,
         required:[true, 'Please choose a country'],
+    },
+    pic:{
+        type:String
     }
 })
 

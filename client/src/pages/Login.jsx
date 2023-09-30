@@ -42,7 +42,7 @@ const Login = () => {
           console.log(error.message);
         }
         enqueueSnackbar(
-          { message: error.message },
+          { message: error.response.data.error},
           {
             variant: "error",
           }

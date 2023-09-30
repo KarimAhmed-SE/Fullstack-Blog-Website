@@ -1,9 +1,20 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "./components/Header";
 import Posts from "./components/Posts";
+import axios from "axios";
 
 const Home = () => {
+
+  const [posts, setPosts] = useState([]);
+  useEffect(()=>{
+    axios.get(`http://localhost:4000/api/displayPost`).then((response)=>{
+      console.log(response)
+      setPosts(response.data);
+    }).catch((error)=>{
+      console.log(error);
+    })
+  }, [])
   return (
     <div>
       <Header />
@@ -15,7 +26,16 @@ const Home = () => {
           Watch the 2023 WordCamp US Keynotes from!!
         </Link>
       </div>
-      <Link to={'/PostDetails'}><Posts /></Link>
+      <Link to={'/PostDetails'}>
+      {posts.length > 0 &&
+        posts.map((post)=>(
+          <Posts {...post} />
+        ))
+      }
+      
+      
+      
+      </Link>
     </div>
   );
 };

@@ -15,17 +15,21 @@ const loginController = async (req, res) => {
         if (result) {
           jwt.sign({email, id:user._id}, process.env.SECRET, {expiresIn: maxAge}, (error, token)=>{
             if(error) throw error;
+            console.log(error)
             return res.status(201).cookie('token', token, {httpOnly: true, maxAge: maxAge * 1000}).json({
               id: user._id,
-              email: user.email
+              email: user.email,
+              pic: user.pic,
+              firstName: user.firstName,
+              lastName: user.lastName,
             });
           });
           
         } else {
-          res.status(400).json({ error: "Password doesn't match" });
+          res.status(400).send({ error: "Password doesn't match" });
         }
       } else {
-        res.status(400).json({ error: "Email doesn't exist!" });
+        res.status(400).send({ error: "This Email doesn't exist" });
       }
     } catch (error) {
       console.log(error);

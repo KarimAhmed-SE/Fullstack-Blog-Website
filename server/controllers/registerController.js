@@ -37,6 +37,8 @@ const handleError = (err) => {
 };
 
 const Register = async (req, res) => {
+
+  const {path} = req.file;
   try {
     const newUser = {
       firstName: req.body.firstName,
@@ -45,6 +47,7 @@ const Register = async (req, res) => {
       password: bcrypt.hashSync(req.body.password, salt),
       sex: req.body.sex,
       country: req.body.country,
+      pic: path,
     };
 
     const user = await User.create(newUser);

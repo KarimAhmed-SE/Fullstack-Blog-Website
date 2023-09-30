@@ -8,6 +8,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import validator from "validator";
+import PictureUpload from "./PictureUpload.png";
 
 const Register = () => {
   const [firstName, setFirstName] = useState("");
@@ -17,6 +18,7 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [sex, setSex] = useState("");
   const [country, setCountry] = useState("");
+  const [file, setFile] = useState();
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
@@ -35,14 +37,25 @@ const Register = () => {
   };
 
   const handleRegister = () => {
-    const data = {
-      firstName,
-      lastName,
-      email,
-      password,
-      sex,
-      country,
-    };
+    // const data = {
+    //   firstName,
+    //   lastName,
+    //   email,
+    //   password,
+    //   sex,
+    //   country,
+    // };
+
+    const data = new FormData();
+
+    data.append("firstName", firstName);
+    data.append("lastName", lastName);
+    data.append("email", email);
+    data.append("password", password);
+    data.append("sex", sex);
+    data.append("country", country);
+    data.append("file", file);
+
     axios
       .post(`http://localhost:4000/api/Register`, data)
       .then(() => {
@@ -186,6 +199,24 @@ const Register = () => {
                 <option value="UAE">UAE</option>
                 <option value="Switzerland">Switzerland</option>
               </select>
+            </div>
+
+            {/* Profile picture here */}
+            <div className=" relative h-10 w-10 my-3">
+              <label htmlFor="input-file">
+                <img
+                  className="cursor-pointer absolute h-10 w-10 ml-3 -top-1 right-0.5"
+                  src={PictureUpload}
+                />
+              </label>
+
+              <input
+                id="input-file"
+                className="hidden"
+                type="file"
+                accept="image/*"
+                onChange={(ev) => setFile(ev.target.files[0])}
+              />
             </div>
           </div>
           <div className="flex flex-col">

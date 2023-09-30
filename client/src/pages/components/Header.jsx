@@ -4,21 +4,23 @@ import logo from "./logo.png";
 import axios from "axios";
 import google from "../Google Logo.png";
 import { userContext } from "../../userContext";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   // const [email, setEmail] = useState("");
   const { userInfo, setUserInfo } = useContext(userContext);
+  const [profilePic, setProfilePic] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
       .get(`http://localhost:4000/profile`, { withCredentials: true })
       .then((response) => {
-
-        
-        console.log(response);
+        // console.log(response);
         // setEmail(response.data.email)
-        setUserInfo(response.data.email);
-        console.log(userInfo);
+        setUserInfo(response.data);
+        // console.log(userInfo);
+        // console.log(response.data[0].pic)
       });
   }, []);
 
@@ -27,9 +29,9 @@ const Header = () => {
     // Better to do this on the backend
 
     axios.post(`http://localhost:4000/logout`, { withCredentials: true });
-    window.location.reload(true);
     setUserInfo(null);
     console.log(userInfo + "hello");
+    navigate("/");
   };
 
   return (
@@ -38,7 +40,7 @@ const Header = () => {
         <div className="flex w-1/4 justify-start items-center space-x-6 px-5">
           <div>
             <Link to={"/"}>
-              <img className="h-10 w-15" src={logo} alt="Logo" />
+              <img className="h-10 w-15 invert" src={logo} alt="Logo" />
             </Link>
           </div>
 
@@ -79,17 +81,22 @@ const Header = () => {
         </div>
 
         {userInfo ? (
-          <div className="flex justify-end items-end space-x-6 w-1/4 px-5">
+          <div className="flex justify-end items-center space-x-6 w-1/4 px-5">
             <Link
-              to={"/createArticle"}
+              to={"/CreatePost"}
               className="font-bold text-3xl text-center text-white"
             >
               {" "}
               +{" "}
             </Link>
-            <div className="hidden rounded-full md:flex h-10 w-15">
+            <div className="hidden rounded-full md:flex h-15 w-15">
               <Link to={"/userProfile"}>
-                <img className="h-10 w-15" src={google} />
+                {userInfo && (
+                  <img
+                    className="h-12 w-12 rounded-full"
+                    src={`http://localhost:4000/${userInfo.pic}`}
+                  />
+                )}
               </Link>
             </div>
             <Link
