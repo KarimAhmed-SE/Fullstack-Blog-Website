@@ -26,16 +26,18 @@ const Home = () => {
           Watch the 2023 WordCamp US Keynotes from!!
         </Link>
       </div>
-      <Link to={'/PostDetails'}>
+     
       {posts.length > 0 &&
         posts.map((post)=>(
+          <Link to={`/PostDetails/${post._id}`}>
           <Posts {...post} />
+          </Link>
         ))
       }
       
       
       
-      </Link>
+      
     </div>
   );
 };

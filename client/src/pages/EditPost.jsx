@@ -6,75 +6,126 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import { useParams } from "react-router-dom";
 import { useSnackbar } from "notistack";
 
 const modules = {
-  toolbar: [
-    [{ header: [1, 2, false] }],
-    ["bold", "italic", "underline", "strike", "blockquote"],
-    [
-      { list: "ordered" },
-      { list: "bullet" },
-      { indent: "-1" },
-      { indent: "+1" },
+    toolbar: [
+      [{ header: [1, 2, false] }],
+      ["bold", "italic", "underline", "strike", "blockquote"],
+      [
+        { list: "ordered" },
+        { list: "bullet" },
+        { indent: "-1" },
+        { indent: "+1" },
+      ],
+      ["link", "image"],
+      ["clean"],
     ],
-    ["link", "image"],
-    ["clean"],
-  ],
-},
-formats = [
-  "header",
-  "bold",
-  "italic",
-  "underline",
-  "strike",
-  "blockquote",
-  "list",
-  "bullet",
-  "indent",
-  "link",
-  "image",
-];
+  },
+  formats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "blockquote",
+    "list",
+    "bullet",
+    "indent",
+    "link",
+    "image",
+  ];
+  
 
-const CreatePost = () => {
-  const [title, setTitle] = useState("");
-  const [summary, setSummary] = useState("");
-  const [body, setBody] = useState("");
-  const [file, setFile] = useState(null);
-  const [tag, setTag] = useState("");
-  const { setUserInfo } = useContext(userContext);
-  const { enqueueSnackbar } = useSnackbar();
-  const navigate = useNavigate();
+const EditPost = () => {
 
 
- 
-
-  const handleSubmit = () => {
-
-    
-    const data = new FormData();
-    data.append('title', title)
-    data.append('summary', summary)
-    data.append('body', body)
-    data.append('file', file)
-    data.append('tag', tag)
-
-    console.log(file);
+    const [title, setTitle] = useState("");
+    const [summary, setSummary] = useState("");
+    const [body, setBody] = useState("");
+    const [file, setFile] = useState(null);
+    const [tag, setTag] = useState("");
+    const { setUserInfo } = useContext(userContext);
+    const [post, setPost] = useState();
+    const [loading, setLoading] = useState(true);
+    const { id } = useParams();
+    const { enqueueSnackbar } = useSnackbar();
+    const navigate = useNavigate();
 
 
+    useEffect(()=>{
 
-    axios.post(`http://localhost:4000/api/createPost`, data, {headers:{'Content-Type': 'multipart/form-data'}, withCredentials:true}).then((response)=>{
-      console.log(response.data)
-      enqueueSnackbar({message: 'Post created Successfully'}, {variant:'success'})
-      navigate("/");
-    }).catch((error)=>{
-      console.log(error);
-    })
-  };
+        console.log("hello");
+        setLoading(true);
+
+        axios
+        .get(`http://localhost:4000/api/showDetails/${id}`, {
+          withCredentials: true,
+        })
+        .then((response) => {
+          console.log(response);
+          setTitle(response.data.title)
+          setSummary(response.data.summary)
+          setBody(response.data.body)
+          setFile(response.data.file)
+          setTag(response.data.tag)
+          setLoading(false)
+          // setEmail(response.data.email)
+          // setUserInfo(response.data.email);
+          // console.log(userInfo);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+        
+    }, [])
+  
+  
+   
+  
+    const handleSubmit = () => {
+  
+      
+      const data = new FormData();
+      data.append('title', title)
+      data.append('summary', summary)
+      data.append('body', body)
+      data.append('file', file)
+      data.append('tag', tag)
+  
+      console.log(file);
+  
+  
+  
+      axios.put(`http://localhost:4000/api/editPost/${id}`, data, {headers:{'Content-Type': 'multipart/form-data'}, withCredentials:true}).then((response)=>{
+        console.log(response.data)
+        navigate(`/PostDetails/${id}`);
+        enqueueSnackbar({message: 'Post updated Successfully'}, {variant:'success'})
+        
+      }).catch((error)=>{
+        console.log(error);
+      })
+    };
+
+
+    const handleDelete = () =>{
+        axios.delete(`http://localhost:4000/api/deletePost/${id}`).then((response)=>{
+            console.log("Post Deleted Successfully")
+            enqueueSnackbar({message: 'Post deleted Successfully'}, {variant:'success'})
+            navigate("/")
+        }).catch((error)=>{
+            console.log(error)
+        })
+    }
+
 
   return (
     <div>
       <Header />
+
+
+      {loading ? (<div>loading...</div>) : (
       <div className="container mx-auto flex flex-col  md:space-y-0 h-screen w-full md:w-3/4">
         <h1 className="text-center font-bold text-3xl mt-10">Create Post</h1>
         <div className="flex flex-col mt-10 w-full justify-center items-center">
@@ -145,7 +196,7 @@ const CreatePost = () => {
 
         <div className="flex justify-end items-end space-x-5">
           <Link
-            to={"/"}
+            to={`/PostDetails/${id}`}
             className="w-1/8 rounded-sm text-gray-500 py-3 px-10 font-bold md:hover:bg-red-300"
           >
             Cancel
@@ -154,12 +205,18 @@ const CreatePost = () => {
             className="bg-blue-500 w-1/8 rounded-sm text-white py-3 px-10 font-bold md:hover:bg-orange-200"
             onClick={handleSubmit}
           >
-            Post
+            Save Changes
+          </button>
+          <button
+            className="bg-red-500 w-1/8 rounded-sm text-white py-3 px-10 font-bold md:hover:bg-red-300"
+            onClick={handleDelete}
+          >
+            Delete
           </button>
         </div>
-      </div>
+      </div>)}
     </div>
-  );
-};
+  )
+}
 
-export default CreatePost;
+export default EditPost

@@ -8,6 +8,9 @@ import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
 import createPostRoutes from "./routes/createPostRoutes.js";
 import displayPostRoutes from "./routes/displayPostRoutes.js";
+import showDetailsRoutes from "./routes/showDetailsRoutes.js";
+import editPostRoutes from "./routes/editPostRoutes.js";
+import deletePostRoutes from './routes/deletePostRoutes.js'
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -53,3 +56,6 @@ app.use("/api/Register", registerRoutes);
 app.use("/api/Login", loginRoutes);
 app.use("/api/createPost", createPostRoutes);
 app.use("/api/displayPost", displayPostRoutes);
+app.use("/api/showDetails", showDetailsRoutes);
+app.use("/api/editPost", editPostRoutes);
+app.use("/api/deletePost", deletePostRoutes);
